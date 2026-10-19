@@ -897,8 +897,8 @@ def any_template(option_value, name, repeated=False):
     {% else %}
     if _has_field(p, \"{{ name.split('.')[-1] }}\"):
     {% endif %}
-        if {{ name }}.type_url not in {{ o['in'] }}:
-            raise ValidationFailed(\"{{ name }} not in {{ o['in'] }}\")
+        if {{ name }}.type_url not in {{ repr(list(o['in'])) }}:
+            raise ValidationFailed({{ repr(name + " not in " + str(list(o['in']))) }})
     {%- endif %}
     {%- if o['not_in'] %}
     {% if repeated %}
@@ -906,12 +906,13 @@ def any_template(option_value, name, repeated=False):
     {% else %}
     if _has_field(p, \"{{ name.split('.')[-1] }}\"):
     {% endif %}
-        if {{ name }}.type_url in {{ o['not_in'] }}:
-            raise ValidationFailed(\"{{ name }} in {{ o['not_in'] }}\")
+        if {{ name }}.type_url in {{ repr(list(o['not_in'])) }}:
+            raise ValidationFailed({{ repr(name + " in " + str(list(o['not_in']))) }})
     {%- endif %}
     """
     return Template(any_tmpl).render(
-        o=option_value.any, name=name, required_template=required_template, repeated=repeated)
+        o=option_value.any, name=name, required_template=required_template, repeated=repeated,
+        repr=_pyrepr, list=list, str=str)
 
 
 def bytes_template(option_value, name):
